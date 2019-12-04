@@ -4,6 +4,9 @@ import ipfs from './ipfs';
 import { Button } from 'reactstrap';
 import { Container, Row, Col } from 'reactstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import FadeIn from "react-fade-in";
+import Lottie from "react-lottie";
+import ReactLoading from "react-loading";
 
 import {address, abi}  from './storehash';
 import Web3 from 'web3';
@@ -15,13 +18,9 @@ class App extends Component {
             ethAddress:'',      
             transactionHash:'',      
             txReceipt: '' ,
-            web3: null, accounts: null, contract: null,   };
+            web3: null, accounts: null, contract: null, done: true  };
 
-  componentDidMount = async () => {
-    // Modern DApp Browsers
 
-  
-};
 
  captureFile =(event) => {
         event.stopPropagation()  
@@ -40,7 +39,9 @@ class App extends Component {
         console.log(this.state.buffer)}
 
   onSubmit = async (event) => {
+          
           event.preventDefault();
+          this.setState({done : undefined})
          const web3 = new Web3(Web3.givenProvider);
           const accounts = await web3.eth.getAccounts()
           this.setState({accounts : accounts[0]})
@@ -52,7 +53,7 @@ class App extends Component {
           console.log(err,ipfsHash);        
           //setState by setting ipfsHash to ipfsHash[0].hash        
           this.setState({ ipfsHash:ipfsHash[0].hash }); 
-
+          this.setState({done : true})
           storehash.methods.setHash(this.state.ipfsHash).send({from: accounts[0]},
             (error, transactionHash) => {          
               console.log(transactionHash);          
@@ -71,7 +72,8 @@ onClick = async () => {
 
   render() {
     return ( 
-      <div className="App">   
+      <div className="App">
+       
 
       <Container> 
       <Row> <Col>
@@ -88,7 +90,16 @@ onClick = async () => {
         </Container>  
 
         <div>
-        <hr/> <Button onClick = {this.onClick}> Get Transaction Receipt </Button> <hr/>  
+        <hr/> 
+        <div >
+        {!this.state.done ? (
+          <ReactLoading type={"bars"} color={"red"} />
+        ) : (
+          <h1></h1>
+        )}   
+        </div>
+        <Button onClick = {this.onClick}> Get Transaction Receipt </Button> <hr/>  
+
 <table bordered responsive>                
 <thead><tr>                    
     <th>Tx Receipt Category</th>                    
@@ -111,10 +122,8 @@ onClick = async () => {
             <td>{this.state.transactionHash}</td>                  
             </tr> </tbody> </table>
 
-
-
         </div>
-    
+
       </div>
 
      );    }}
