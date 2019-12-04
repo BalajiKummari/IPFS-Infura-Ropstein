@@ -42,11 +42,13 @@ class App extends Component {
           
           event.preventDefault();
           this.setState({done : undefined})
-
+          window.ethereum.enable()
           //setting up web3 to talk to meta mask
           const web3 = new Web3(Web3.givenProvider);
           const accounts = await web3.eth.getAccounts()
           this.setState({accounts : accounts[0]})
+          console.log("account address",accounts[0])
+
           const storehash = new web3.eth.Contract(abi,address) 
          
           //save document to IPFS,return its hash#, and set hash# to state      
